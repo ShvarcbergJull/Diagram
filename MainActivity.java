@@ -10,23 +10,21 @@ import android.widget.EditText;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    String[] input_values;
     EditText et;
-    Button button;
+    boolean flagin = false;
+    Diagram_View dv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         et = findViewById(R.id.parts);
-//        button = findViewById(R.id.form);
-//        Diagram_View dv = new Diagram_View(this);
-//        button.setOnClickListener(dv);
+        dv = findViewById(R.id.diagram);
     }
 
-    public void onClick(View v)
-    {
-        String text_input = et.getText().toString();
-        input_values = text_input.split(" ");
+    public void onClick(View v) {
+       String temp = et.getText().toString();
+       flagin = true;
+       dv.tester(temp);
     }
 }
