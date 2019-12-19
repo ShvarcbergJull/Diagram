@@ -22,6 +22,8 @@ public class Diagram_View extends View {
     float[] sweet;
     ArrayList<Sector> sectors = new ArrayList<>();
     float w, h;
+    float[] procone;
+    String text = "";
 
     public Diagram_View(Context context) {
         super(context);
@@ -47,11 +49,21 @@ public class Diagram_View extends View {
             numbers[i] = Integer.parseInt(inform[i]);
             count += numbers[i];
         }
+        float pr = 100 / count;
         count = 360 / count;
         sweet = new float[numbers.length];
+        procone = new float[numbers.length];
 
         for (int i = 0;i < numbers.length;i++) {
             sweet[i] = numbers[i] * count;
+            procone[i] = numbers[i] * pr;
+//            Log.d("deb_proc", String.valueOf(procone[i]));
+        }
+    }
+
+    private void clearSec() {
+        for (int i = 0;i < sectors.toArray().length;i++) {
+            sectors.get(i).bg = false;
         }
     }
 
@@ -61,8 +73,8 @@ public class Diagram_View extends View {
         int start = 0;
         for (int i = 0;i < sweet.length;i++)
         {
-            Sector s = new Sector(0, 0, w, w, start, sweet[i], Color.rgb((int)(Math.random() * 255), (int)(Math.random() * 255), (int)(Math.random() * 255)));
-            start += sweet[i];
+            Sector s = new Sector(0, 150, w, w + 150, start, sweet[i], Color.rgb((int)(Math.random() * 255), (int)(Math.random() * 255), (int)(Math.random() * 255)), procone[i]);
+            start += sweet[i] + 0.001;
             sectors.add(s);
         }
     }
@@ -70,13 +82,37 @@ public class Diagram_View extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         w = canvas.getWidth(); h = canvas.getHeight();
-        if (activity.flagin == true) {
-            for (int i = 0;i < sectors.toArray().length;i++)
-            {
+        for (int i = 0;i < sectors.toArray().length;i++)
+        {
+//            sectors.get(i).draw(canvas);
+            if (sectors.get(i).bg) {
+//                sectors.get(i).drawBg(canvas);
+                sectors.get(i).drawWithMove(canvas);
+            }
+            else {
                 sectors.get(i).draw(canvas);
             }
-            activity.flagin = false;
         }
+        Paint p = new Paint();
+        p.setColor(Color.CYAN);
+//        p.setTextSize();
+        canvas.drawText(text, w / 2, w + 50, p);
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            clearSec();
+            activity.setTv("");
+            for (int i = 0; i < sectors.toArray().length; i++) {
+                if (sectors.get(i).inSector(event.getX(), event.getY())) {
+                    activity.setTv(String.valueOf(sectors.get(i).proc));
+                    sectors.get(i).bg = true;
+                    break;
+                }
+            }
+            invalidate();
+        }
+        return true;
+    }
 }
